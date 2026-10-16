@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lesson 5: The Multiverse Matrix // Conditionals Masterclass</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #121826;
+      --card-border: #1f2c44;
+      --spider-red: #ff2a5f;
+      --spider-red-glow: rgba(255, 42, 95, 0.35);
+      --spider-cyan: #00f0ff;
+      --spider-cyan-soft: rgba(0, 240, 255, 0.12);
+      --spider-yellow: #ffd166;
+      --spider-green: #06d6a0;
+      --cream: #f4f6fc;
+      --muted: #8d9bb0;
+      --dark-panel: #070a10;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(255, 42, 95, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(0, 240, 255, 0.08) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(9,13,22,1) 0%, rgba(13,19,33,1) 100%);
+      color: var(--cream);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      padding: 30px 16px 100px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* FLOATING SPARK PARTICLES */
+    .spark-field {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .spark {
+      position: absolute;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--spider-cyan);
+      box-shadow: 0 0 8px var(--spider-cyan);
+      animation: floatSpark 16s linear infinite;
+      opacity: 0.3;
+    }
+    @keyframes floatSpark {
+      0% { transform: translateY(105vh) translateX(0) scale(0.8); opacity: 0; }
+      20% { opacity: 0.6; }
+      80% { opacity: 0.4; }
+      100% { transform: translateY(-10vh) translateX(40px) scale(1.2); opacity: 0; }
+    }
+    .spark:nth-child(1) { left: 12%; animation-duration: 12s; background: var(--spider-red); box-shadow: 0 0 8px var(--spider-red); }
+    .spark:nth-child(2) { left: 34%; animation-duration: 20s; animation-delay: 3s; }
+    .spark:nth-child(3) { left: 58%; animation-duration: 15s; animation-delay: 1s; background: var(--spider-yellow); box-shadow: 0 0 8px var(--spider-yellow); }
+    .spark:nth-child(4) { left: 82%; animation-duration: 18s; animation-delay: 5s; }
+    .spark:nth-child(5) { left: 94%; animation-duration: 14s; animation-delay: 2s; background: var(--spider-red); box-shadow: 0 0 8px var(--spider-red); }
+
+    .wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+    .hud-meta {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--spider-cyan);
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 20px;
+      background: var(--spider-cyan-soft);
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.7rem;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 12px;
+      text-shadow: 0 0 20px rgba(255, 42, 95, 0.35);
+    }
+    .sub-title {
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 720px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* CHAPTER NAVIGATION NAV */
+    .chapter-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 28px 0 35px;
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 40px;
+      padding: 8px 16px;
+    }
+    .nav-pill {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    .nav-pill:hover, .nav-pill.active {
+      color: #fff;
+      background: var(--spider-red);
+      box-shadow: 0 0 12px var(--spider-red-glow);
+    }
+
+    /* CARD STYLING */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      margin-bottom: 38px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+      position: relative;
+    }
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--spider-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border: 1px solid var(--card-border);
+      padding: 4px 10px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      background: #090e18;
+    }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.85rem;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    p, li {
+      font-size: 1.02rem;
+      line-height: 1.75;
+      color: var(--cream);
+    }
+    strong { color: #fff; }
+
+    /* CALLOUT BOXES */
+    .concept-box {
+      background: #0b111c;
+      border-left: 4px solid var(--spider-cyan);
+      border-radius: 0 12px 12px 0;
+      padding: 18px 22px;
+      margin: 20px 0;
+      line-height: 1.7;
+    }
+    .concept-box.warn {
+      border-left-color: var(--spider-red);
+      background: rgba(255, 42, 95, 0.06);
+    }
+    .concept-box.gold {
+      border-left-color: var(--spider-yellow);
+      background: rgba(255, 209, 102, 0.06);
+    }
+
+    /* BUTTONS */
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--spider-red);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 16px var(--spider-red-glow);
+      transition: all 0.25s ease;
+      margin-top: 12px;
+    }
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(255, 42, 95, 0.55);
+      background: #ff4775;
+    }
+    .action-btn.cyan {
+      background: var(--spider-cyan);
+      color: #050a14;
+      box-shadow: 0 4px 16px rgba(0, 240, 255, 0.3);
+    }
+    .action-btn.cyan:hover {
+      background: #38f4ff;
+      box-shadow: 0 6px 22px rgba(0, 240, 255, 0.5);
+    }
+
+    /* MATCHING GRID */
+    .match-deck {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .match-tile {
+      background: #0b111d;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+    .match-tile:hover {
+      border-color: var(--spider-cyan);
+      background: rgba(0, 240, 255, 0.05);
+    }
+    .match-tile.selected {
+      border-color: var(--spider-red);
+      background: rgba(255, 42, 95, 0.15);
+      box-shadow: 0 0 12px var(--spider-red-glow);
+    }
+    .match-tile.matched {
+      border-color: var(--spider-green);
+      background: rgba(6, 214, 160, 0.12);
+      cursor: default;
+    }
+
+    /* DEBUG TERMINAL */
+    .terminal-board {
+      background: #060910;
+      border: 1px solid #1c273e;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 18px 0;
+      line-height: 2.3;
+      font-size: 1.02rem;
+    }
+    .chip-selector {
+      display: inline-flex;
+      gap: 6px;
+      vertical-align: middle;
+      margin: 0 4px;
+    }
+    .chip {
+      background: #141c2b;
+      border: 1px solid var(--card-border);
+      color: var(--cream);
+      padding: 2px 12px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover { border-color: var(--spider-cyan); }
+    .chip.chosen {
+      background: var(--spider-cyan);
+      color: #060c18;
+      border-color: var(--spider-cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    }
+    input.gap-text {
+      background: #111824;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--spider-yellow);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.98rem;
+      padding: 4px 10px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    input.gap-text:focus {
+      border-color: var(--spider-cyan);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+    }
+
+    /* THE MULTIVERSE COMPARISON TABLE */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: #090e18;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+    .matrix-table th, .matrix-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.93rem;
+      line-height: 1.6;
+    }
+    .matrix-table th {
+      background: #101828;
+      color: var(--spider-cyan);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .matrix-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* REALITY SPECTRUM SLIDER DISPLAY */
+    .spectrum-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .spectrum-card {
+      background: #090f1a;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .spectrum-card:hover, .spectrum-card.active {
+      transform: translateY(-3px);
+      border-color: var(--spider-red);
+      box-shadow: 0 6px 18px var(--spider-red-glow);
+    }
+    .spectrum-card strong { display: block; font-size: 1.05rem; margin-bottom: 4px; }
+    .spectrum-card .prob-badge {
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    /* CONTRAST DUEL BOX */
+    .contrast-arena {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 18px 0;
+    }
+    .contrast-panel {
+      background: #0b111e;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .contrast-panel h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+      color: var(--spider-yellow);
+    }
+
+    /* VERB ANCHOR FORGE */
+    .verb-forge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .verb-tile {
+      background: #090e18;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .verb-tile .v-base { font-size: 1.15rem; color: #fff; font-weight: 800; }
+    .verb-tile .v-v2 { color: var(--spider-green); font-size: 0.95rem; margin-top: 6px; }
+    .verb-tile .v-v3 { color: var(--spider-cyan); font-size: 0.95rem; margin-top: 2px; }
+
+    /* B2 LISTENING HUD */
+    .listening-hud {
+      background: #080c14;
+      border: 1px solid var(--spider-cyan);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .sound-bars {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      height: 24px;
+    }
+    .bar {
+      width: 4px;
+      background: var(--spider-cyan);
+      border-radius: 3px;
+      animation: barOscillate 1.2s infinite ease-in-out alternate;
+    }
+    .bar:nth-child(2) { animation-delay: 0.2s; height: 18px; }
+    .bar:nth-child(3) { animation-delay: 0.4s; height: 26px; }
+    .bar:nth-child(4) { animation-delay: 0.1s; height: 12px; }
+    .bar:nth-child(5) { animation-delay: 0.5s; height: 20px; }
+    @keyframes barOscillate {
+      0% { height: 6px; }
+      100% { height: 24px; }
+    }
+
+    .q-card {
+      background: #0a0f1c;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      transition: border-color 0.25s;
+    }
+    .q-card p { font-weight: 700; margin-bottom: 10px; color: #fff; }
+    .q-card label {
+      display: block;
+      margin: 8px 0;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+    .q-card label:hover { color: var(--cream); }
+    .q-card input[type="radio"] { margin-right: 10px; accent-color: var(--spider-red); }
+
+    /* WRITING TERMINAL */
+    .writing-prompt-card {
+      background: #090e18;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .prompt-target {
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--spider-yellow);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    textarea.oper-input {
+      width: 100%;
+      height: 75px;
+      background: #060910;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.98rem;
+      padding: 12px;
+      resize: vertical;
+      outline: none;
+      margin-top: 10px;
+      transition: border-color 0.2s;
+    }
+    textarea.oper-input:focus {
+      border-color: var(--spider-cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+    }
+    .status-tag {
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 8px;
+      display: block;
+    }
+
+    /* VALIDATION MESSAGES */
+    .score-banner {
+      background: #0c1424;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-top: 14px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="spark-field">
+  <div class="spark"></div><div class="spark"></div><div class="spark"></div>
+  <div class="spark"></div><div class="spark"></div>
+</div>
+
+<div class="wrapper">
+  <header>
+    <div class="hud-meta">SPIDER-SOCIETY MULTIVERSE DOSSIER // CASE #05</div>
+    <h1>The Algorithmic Multiverse</h1>
+    <p class="sub-title">A complete masterclass on Conditionals 0, 1, 2, and 3: intuitive logic, deep use cases, irregular verb mechanics, and authentic B2 communication.</p>
+    
+    <nav class="chapter-nav">
+      <a class="nav-pill" onclick="scrollToId('ch1')">01 Vocab</a>
+      <a class="nav-pill" onclick="scrollToId('ch2')">02 The Reality Spectrum</a>
+      <a class="nav-pill" onclick="scrollToId('ch3')">03 Recap (0 &amp; 1)</a>
+      <a class="nav-pill" onclick="scrollToId('ch4')">04 Deep Explanations (2 &amp; 3)</a>
+      <a class="nav-pill" onclick="scrollToId('ch5')">05 Verb Anchor Forge</a>
+      <a class="nav-pill" onclick="scrollToId('ch6')">06 B2 Listening</a>
+      <a class="nav-pill" onclick="scrollToId('ch7')">07 Writing Labs</a>
+    </nav>
+  </header>
+
+  <!-- CHAPTER 1: VOCABULARY -->
+  <section class="section-card" id="ch1">
+    <div class="section-badge">Chapter 01 // Tactical Lexicon</div>
+    <h2>High-Tech &amp; Esports Terminology</h2>
+    <p>In competitive gaming and software architecture, technical precision is everything. Click a term on the left, then click its corresponding definition on the right to calibrate your HUD:</p>
+
+    <div class="match-deck">
+      <div id="deck-left" style="display:flex; flex-direction:column; gap:10px;">
+        <div class="match-tile" data-node="1">1. Frame Rate Drop (FPS Drop)</div>
+        <div class="match-tile" data-node="2">2. Procedural Generation</div>
+        <div class="match-tile" data-node="3">3. Patch / Hotfix</div>
+        <div class="match-tile" data-node="4">4. Latency Spike</div>
+        <div class="match-tile" data-node="5">5. AI Pathfinding</div>
+      </div>
+      <div id="deck-right" style="display:flex; flex-direction:column; gap:10px;">
+        <div class="match-tile" data-match="4">A. A sharp surge in ping causing delay and player teleportation.</div>
+        <div class="match-tile" data-match="1">B. Stuttering visual performance when the GPU cannot process 3D assets fast enough.</div>
+        <div class="match-tile" data-match="5">C. Algorithms directing how non-player entities route through 3D terrain.</div>
+        <div class="match-tile" data-match="2">D. Creating game environments through algorithms rather than pre-drawn designs.</div>
+        <div class="match-tile" data-match="3">E. An urgent code update deployed to resolve critical glitches or crashes.</div>
+      </div>
+    </div>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span id="matchScore" style="font-family:'JetBrains Mono', monospace; font-size:0.85rem; color:var(--muted);">Linked: 0 / 5 Nodes</span>
+      <button class="action-btn" style="background:#202d45; box-shadow:none; padding:6px 16px; font-size:0.8rem;" onclick="resetMatches()">↺ Reset Pairs</button>
+    </div>
+  </section>
+
+  <!-- CHAPTER 2: THE REALITY & TIMELINE SPECTRUM (DEEP EXPLANATION) -->
+  <section class="section-card" id="ch2">
+    <div class="section-badge">Chapter 02 // The Grand Architecture</div>
+    <h2>The Conditionals Reality Spectrum: Which One Do I Pick?</h2>
+    <p>English speakers don't pick a conditional because of grammar rules in a textbook. They pick a conditional based on <strong>two fundamental questions</strong>:</p>
+
+    <div class="contrast-arena" style="margin:20px 0;">
+      <div class="contrast-panel">
+        <h4>1. What is the Probability?</h4>
+        <p style="font-size:0.92rem; color:var(--muted);">
+          • <strong>100% Guaranteed</strong> = Type 0 (Universal Law)<br>
+          • <strong>50% Plausible / Likely</strong> = Type 1 (Real Plan)<br>
+          • <strong>1% Fantasy / Unreal</strong> = Type 2 (Daydream)<br>
+          • <strong>0% Impossible</strong> = Type 3 (Past History)
+        </p>
+      </div>
+      <div class="contrast-panel">
+        <h4>2. What is the Timeframe?</h4>
+        <p style="font-size:0.92rem; color:var(--muted);">
+          • <strong>Timeless / Any Time</strong> = Type 0<br>
+          • <strong>Future / Upcoming</strong> = Type 1<br>
+          • <strong>Right Now (Hypothetical)</strong> = Type 2<br>
+          • <strong>Already Finished Yesterday</strong> = Type 3
+        </p>
+      </div>
+    </div>
+
+    <!-- SIDE-BY-SIDE ALL-IN-ONE MASTER MATRIX -->
+    <h3 style="font-family:'Playfair Display', serif; font-size:1.35rem; color:#fff; margin-top:28px;">The All-in-One Multiverse Comparison Matrix</h3>
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Conditional</th>
+          <th>Probability</th>
+          <th>Timeframe</th>
+          <th>Formula Blueprint</th>
+          <th>Real-World Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--spider-cyan);">Type 0</strong></td>
+          <td>100% (Certain)</td>
+          <td>Timeless / Always</td>
+          <td><code>If + Present Simple, ... Present Simple</code></td>
+          <td>If you overclock a CPU without cooling, it overheats.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--spider-green);">Type 1</strong></td>
+          <td>50% (Real chance)</td>
+          <td>Tomorrow / Future</td>
+          <td><code>If + Present Simple, ... will / can + V1</code></td>
+          <td>If we practice tonight, we will win our match on Saturday.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--spider-yellow);">Type 2</strong></td>
+          <td>1% (Unreal / Dream)</td>
+          <td>Right Now / Future</td>
+          <td><code>If + Past Simple (V2), ... would + V1</code></td>
+          <td>If I had an RTX 4090 right now, I would stream in 4K.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--spider-red);">Type 3</strong></td>
+          <td>0% (Impossible)</td>
+          <td>Finished Past</td>
+          <td><code>If + had + V3, ... would have + V3</code></td>
+          <td>If we had installed the patch on Friday, the game wouldn't have crashed.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- CHAPTER 3: RECAP (CONDITIONALS 0 & 1 DEBUG TERMINAL) -->
+  <section class="section-card" id="ch3">
+    <div class="section-badge">Chapter 03 // Live Console Diagnostics</div>
+    <h2>Conditionals 0 &amp; 1: The Romexpo Mainframe Anomaly</h2>
+    <p>Read the incident report from the Bucharest Gaming Week arena floor. Complete each gap. Notice how some are quick choice chips while others require typed entry to test your mastery:</p>
+
+    <div class="terminal-board">
+      <code>[ROMEXPO HALL B // ROOT CONSOLE // ERROR LOG 14:10]</code><br><br>
+      
+      <strong>Rule 01 (Hardware Physics):</strong> When server temperatures exceed 85°C, safety switches 
+      <div class="chip-selector" id="c0_1">
+        <span class="chip" onclick="selectChip(this)">trigger</span>
+        <span class="chip" onclick="selectChip(this)">will trigger</span>
+      </div>
+      automatic cooling immediately. (Universal truth)<br><br>
+
+      <strong>Rule 02 (Operating System Law):</strong> If a process experiences a critical null pointer error, the kernel 
+      <input type="text" class="gap-text" id="c0_2" placeholder="terminate" style="width:115px;"> (terminate) the memory thread.<br><br>
+
+      <strong>Emergency Dispatch (Real Future):</strong> "Listen! If the arena technician 
+      <div class="chip-selector" id="c1_1">
+        <span class="chip" onclick="selectChip(this)">replaces</span>
+        <span class="chip" onclick="selectChip(this)">will replace</span>
+      </div>
+      the blown optical cable in the next ten minutes, we 
+      <input type="text" class="gap-text" id="c1_2" placeholder="broadcast" style="width:130px;"> (broadcast) the semi-finals on the main stage!"<br><br>
+
+      <strong>Tactical Warning:</strong> "Hurry up! If our opponents 
+      <input type="text" class="gap-text" id="c1_3" placeholder="discover" style="width:110px;"> (discover) this exploit before game three, they 
+      <div class="chip-selector" id="c1_4">
+        <span class="chip" onclick="selectChip(this)">ban</span>
+        <span class="chip" onclick="selectChip(this)">will ban</span>
+      </div>
+      our best character class!"
+    </div>
+
+    <button class="action-btn" onclick="validateTerminalRecap()">🕸️ Verify Console Data</button>
+    <div class="score-banner" id="terminalBanner"></div>
+  </section>
+
+  <!-- CHAPTER 4: DEEP EXPLANATIONS FOR CONDITIONALS 2 & 3 -->
+  <section class="section-card" id="ch4">
+    <div class="section-badge">Chapter 04 // The Multiverse Deep Dive</div>
+    <h2>Mastering Conditionals 2 &amp; 3: Nuance, Mindset &amp; Contrasts</h2>
+    
+    <!-- CONTRAST 1: TYPE 1 VS TYPE 2 -->
+    <div class="concept-box">
+      <h3 style="color:var(--spider-cyan); margin-bottom:6px;">Contrast Duel #1: Type 1 vs. Type 2 (Confidence vs. Fantasy)</h3>
+      <p>Compare these two sentences. Both talk about the future, but they mean completely different things:</p>
+      <div style="margin-top:10px; line-height:1.9;">
+        • <strong>Type 1:</strong> <em>"If I <strong>get</strong> 100% on my English exam next week, my father <strong>will buy</strong> me the new headset."</em><br>
+        <span style="color:var(--muted); font-size:0.9rem;">➔ <strong>Speaker's Mindset:</strong> I studied hard. This is very possible and realistic!</span><br>
+        • <strong>Type 2:</strong> <em>"If I <strong>got</strong> a million dollars tomorrow, I <strong>would build</strong> an esports stadium in Bucharest."</em><br>
+        <span style="color:var(--muted); font-size:0.9rem;">➔ <strong>Speaker's Mindset:</strong> A total daydream. Fun to imagine, but almost zero probability.</span>
+      </div>
+    </div>
+
+    <!-- TYPE 2 DEEP DIVE -->
+    <div class="concept-box gold">
+      <h3 style="color:var(--spider-yellow); margin-bottom:6px;">Conditional 2: The Hypothetical Present / Dream</h3>
+      <p><strong>When do you use it?</strong></p>
+      <ul style="margin:8px 0 10px 22px;">
+        <li><strong>Daydreaming about your current life:</strong> <em>"If I <strong>had</strong> more free time after school, I <strong>would learn</strong> game design."</em> (Reality: You have too much homework right now).</li>
+        <li><strong>Giving Advice:</strong> <em>"If I <strong>were</strong> you, I <strong>would talk</strong> to the coach about your role."</em> (Notice: In formal English, we use <em>were</em> instead of <em>was</em> for all persons: <em>If I were, if he were</em>).</li>
+        <li><strong>Imagining alternate physics or science fiction:</strong> <em>"If humans <strong>could</strong> fly, we <strong>would not need</strong> airports."</em></li>
+      </ul>
+      <p style="font-family:'JetBrains Mono', monospace; font-size:0.9rem; color:#fff;">
+        Formula: <code>If + Past Simple (V2), ... would / could / might + V1</code>
+      </p>
+    </div>
+
+    <!-- CONTRAST 2: TYPE 2 VS TYPE 3 -->
+    <div class="concept-box warn">
+      <h3 style="color:var(--spider-red); margin-bottom:6px;">Contrast Duel #2: Type 2 vs. Type 3 (Present Dream vs. Past Regret)</h3>
+      <p>This is where many students hesitate. Notice the timeline difference:</p>
+      <div style="margin-top:10px; line-height:1.9;">
+        • <strong>Type 2 (Talking about NOW):</strong> <em>"If I <strong>spoke</strong> fluent Japanese right now, I <strong>would translate</strong> this game."</em><br>
+        <span style="color:var(--muted); font-size:0.9rem;">➔ Situation is occurring currently in the present.</span><br>
+        • <strong>Type 3 (Talking about YESTERDAY):</strong> <em>"If I <strong>had studied</strong> for yesterday's test, I <strong>would have passed</strong>."</em><br>
+        <span style="color:var(--muted); font-size:0.9rem;">➔ The test is over. Time has moved forward. You cannot change what happened!</span>
+      </div>
+    </div>
+
+    <!-- TYPE 3 DEEP DIVE -->
+    <div class="concept-box" style="border-left-color:var(--spider-red);">
+      <h3 style="color:var(--spider-red); margin-bottom:6px;">Conditional 3: The Time Machine (Alternative History)</h3>
+      <p><strong>When do you use it?</strong></p>
+      <ul style="margin:8px 0 10px 22px;">
+        <li><strong>Post-Match Debriefs (Esports &amp; Sports):</strong> <em>"If our sniper <strong>had hit</strong> that shot in Round 15, we <strong>would have qualified</strong> for the finals."</em></li>
+        <li><strong>Regrets &amp; Excuses:</strong> <em>"If my alarm <strong>had gone</strong> off at 07:00, I <strong>would not have been</strong> late for school."</em></li>
+        <li><strong>Historical "What Ifs":</strong> <em>"If the Roman Empire <strong>had not collapsed</strong>, European history <strong>would have looked</strong> completely different."</em></li>
+      </ul>
+      <p style="font-family:'JetBrains Mono', monospace; font-size:0.9rem; color:#fff;">
+        Formula: <code>If + had + V3 (Past Perfect), ... would have + V3</code>
+      </p>
+    </div>
+
+    <!-- GAP PRACTICE FOR COND 2 & 3 -->
+    <h3 style="font-family:'Playfair Display', serif; font-size:1.35rem; color:#fff; margin:24px 0 14px;">Multiverse Practice: Complete the Gaps</h3>
+    <ol style="margin-left:22px; line-height:2.4;">
+      <li>If my squad <input type="text" class="gap-text" id="m_c2_1" placeholder="have" style="width:90px;"> a 500-euro gaming budget right now, we <input type="text" class="gap-text" id="m_c2_2" placeholder="buy" style="width:130px;"> mechanical keyboards for everyone. [Type 2: Present Dream]</li>
+      <li>If the studio <input type="text" class="gap-text" id="m_c3_1" placeholder="test" style="width:100px;"> the code on Thursday, they <input type="text" class="gap-text" id="m_c3_2" placeholder="find" style="width:150px;"> the bug before the Romexpo tournament yesterday. [Type 3: Past Regret]</li>
+      <li>If Andrei <input type="text" class="gap-text" id="m_c2_3" placeholder="know" style="width:95px;"> how to animate in Blender, he <input type="text" class="gap-text" id="m_c2_4" placeholder="design" style="width:135px;"> our team logo today. [Type 2]</li>
+      <li>If we <input type="text" class="gap-text" id="m_c3_3" placeholder="not lose" style="width:125px;"> internet connection last night, our streamer <input type="text" class="gap-text" id="m_c3_4" placeholder="reach" style="width:150px;"> 10,000 live viewers! [Type 3]</li>
+    </ol>
+    <button class="action-btn" onclick="validateMultiverseGaps()">🌌 Verify Multiverse Timelines</button>
+    <div class="score-banner" id="matrixBanner"></div>
+  </section>
+
+  <!-- CHAPTER 5: IRREGULAR VERB ANCHOR FORGE -->
+  <section class="section-card" id="ch5">
+    <div class="section-badge">Chapter 05 // Mechanical Integrity</div>
+    <h2>The Spider Anchor Law: Irregular Verb Precision</h2>
+    <p>Theo, when writing essays, past stories, or Conditional 3 sentences, remember this core rule:</p>
+
+    <div class="concept-box gold">
+      <p style="font-size:1.05rem;">
+        ⚡ <strong>V2 (Simple Past) SWINGS ALONE:</strong> It never has a helper verb next to it.<br>
+        <em>"Our community <strong>grew</strong> by 50% last winter."</em> (Never say: <em>"was grew"</em> or <em>"has grew"</em>).<br><br>
+        🕸️ <strong>V3 (Past Participle) MUST HAVE A WEB-LINE HELPER (have / has / had / is / was / been):</strong><br>
+        <em>"If our studio had <strong>grown</strong>..." / "The game was <strong>built</strong> in Unreal Engine."</em>
+      </p>
+    </div>
+
+    <div class="verb-forge-grid">
+      <div class="verb-tile">
+        <div class="v-base">grow</div>
+        <div class="v-v2">V2: grew (Alone)</div>
+        <div class="v-v3">V3: had grown</div>
+      </div>
+      <div class="verb-tile">
+        <div class="v-base">build</div>
+        <div class="v-v2">V2: built (Alone)</div>
+        <div class="v-v3">V3: had built</div>
+      </div>
+      <div class="verb-tile">
+        <div class="v-base">freeze</div>
+        <div class="v-v2">V2: froze (Alone)</div>
+        <div class="v-v3">V3: had frozen</div>
+      </div>
+      <div class="verb-tile">
+        <div class="v-base">write</div>
+        <div class="v-v2">V2: wrote (Alone)</div>
+        <div class="v-v3">V3: had written</div>
+      </div>
+      <div class="verb-tile">
+        <div class="v-base">run</div>
+        <div class="v-v2">V2: ran (Alone)</div>
+        <div class="v-v3">V3: had run</div>
+      </div>
+    </div>
+
+    <h4 style="color:#fff; margin:20px 0 10px;">Calibration Check: Insert the single correct form:</h4>
+    <div style="line-height:2.2;">
+      1. During the intense tournament match yesterday, the graphics card <input type="text" class="gap-text" id="v1" placeholder="freeze / froze / frozen" style="width:150px;">.<br>
+      2. If our team had <input type="text" class="gap-text" id="v2" placeholder="build / built" style="width:130px;"> a defense tower earlier, our base wouldn't have fallen.<br>
+      3. The lead programmer <input type="text" class="gap-text" id="v3" placeholder="write / wrote / written" style="width:140px;"> over 500 lines of clean code last night.<br>
+      4. Over the last two years, our local gaming channel has <input type="text" class="gap-text" id="v4" placeholder="grow / grew / grown" style="width:140px;"> enormously.
+    </div>
+    <button class="action-btn" onclick="validateVerbForge()">⚡ Calibrate Web-Shooters</button>
+    <div class="score-banner" id="verbBanner"></div>
+  </section>
+
+  <!-- CHAPTER 6: B2 LISTENING INTERCEPT -->
+  <section class="section-card" id="ch6">
+    <div class="section-badge">Chapter 06 // Radio Intercept</div>
+    <h2>B2 Listening: Emergency Technical Dispatch</h2>
+    <p style="margin-bottom:16px;">Listen to the operational broadcast by the Technical Director behind the scenes at Romexpo Hall B. Listen for cause-and-effect relationships, tone, and past regrets:</p>
+
+    <div class="listening-hud">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="action-btn" id="playAudioBtn" onclick="toggleSpeech()">▶ Stream Dispatch (TTS)</button>
+        <button class="action-btn" style="background:#24324a; box-shadow:none;" onclick="stopSpeech()">⏹ Stop</button>
+      </div>
+      <div class="sound-bars" id="hudWave" style="opacity:0.25;">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div>
+      </div>
+    </div>
+
+    <div id="listeningDeck">
+      <div class="q-card" id="qc1">
+        <p>1. What primary technical issue provoked the severe server bottleneck during the exhibition match?</p>
+        <label><input type="radio" name="bq1" value="A"> A) An external DDoS attack launched by rival gaming organizations.</label>
+        <label><input type="radio" name="bq1" value="B"> B) Excessive computational demand caused by real-time pathfinding for hundreds of AI spectator avatars.</label>
+        <label><input type="radio" name="bq1" value="C"> C) A sudden power grid failure across the northern sector of Bucharest.</label>
+      </div>
+
+      <div class="q-card" id="qc2">
+        <p>2. Why did the director reject the proposal to reduce the server tick-rate to 30 Hz?</p>
+        <label><input type="radio" name="bq2" value="A"> A) It would trigger hitbox discrepancies, causing bullets to pass through targets.</label>
+        <label><input type="radio" name="bq2" value="B"> B) The visual monitors in Hall B would immediately lose synchronization.</label>
+        <label><input type="radio" name="bq2" value="C"> C) The tournament rules explicitly forbid software alterations during weekdays.</label>
+      </div>
+
+      <div class="q-card" id="qc3">
+        <p>3. What past regret does the director articulate regarding their preparation?</p>
+        <label><input type="radio" name="bq3" value="A"> A) If they had purchased high-end optical switches, ping would have stayed under 5ms.</label>
+        <label><input type="radio" name="bq3" value="B"> B) If they had hired external consultants, the stage lighting would have functioned.</label>
+        <label><input type="radio" name="bq3" value="C"> C) If they had conducted a synthetic stress-test on Thursday, they would have caught the memory bug.</label>
+      </div>
+
+      <div class="q-card" id="qc4">
+        <p>4. What immediate mitigation protocol will the technical team deploy for the 16:30 finals?</p>
+        <label><input type="radio" name="bq4" value="A"> A) Postponing the tournament finals until Sunday morning.</label>
+        <label><input type="radio" name="bq4" value="B"> B) Disabling non-essential background scripts, audience models, and ambient particle effects.</label>
+        <label><input type="radio" name="bq4" value="C"> C) Relocating all players to an offline local-area-network backup room.</label>
+      </div>
+    </div>
+
+    <button class="action-btn" onclick="validateListening()">📡 Decrypt Radio Intel</button>
+    <div class="score-banner" id="listeningBanner"></div>
+  </section>
+
+  <!-- CHAPTER 7: GUIDED WRITING TERMINAL -->
+  <section class="section-card" id="ch7">
+    <div class="section-badge">Chapter 07 // Operative Sentence Terminal</div>
+    <h2>Field Writing: Compose Your Conditionals</h2>
+    <p>Construct complete sentences using the prompts below. The system will check that you include the correct grammar structures and verbs:</p>
+
+    <!-- PROMPT 1: TYPE 2 -->
+    <div class="writing-prompt-card">
+      <div class="prompt-target">Mission 01 // Conditional 2 (Present Dream)</div>
+      <p style="font-size:0.95rem; color:var(--cream);">
+        Imagine your dream gaming computer or Spider-Suit gadget. Write a sentence stating what you <strong>would do</strong> if you <strong>owned</strong> it right now.
+      </p>
+      <textarea class="oper-input" id="wr1" placeholder="e.g., If I owned an advanced neural spider-suit right now, I would swing across the Bucharest skyline..."></textarea>
+      <span class="status-tag" id="wr1-status"></span>
+    </div>
+
+    <!-- PROMPT 2: TYPE 3 -->
+    <div class="writing-prompt-card">
+      <div class="prompt-target">Mission 02 // Conditional 3 (Past Regret with 'freeze' or 'grow')</div>
+      <p style="font-size:0.95rem; color:var(--cream);">
+        Look back at a match, tournament, or game round you lost in the past. Write a sentence explaining what <strong>would have happened</strong> if your computer <strong>had not frozen</strong> or if your team <strong>had grown</strong> faster.
+      </p>
+      <textarea class="oper-input" id="wr2" placeholder="e.g., If my computer had not frozen during the final round, our squad would have won the tournament yesterday..."></textarea>
+      <span class="status-tag" id="wr2-status"></span>
+    </div>
+
+    <button class="action-btn" onclick="validateWriting()">🚀 Analyze Operative Sentences</button>
+    <div class="score-banner" id="writingBanner"></div>
+  </section>
+</div>
+
+<script>
+// SCROLL UTILITY
+function scrollToId(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+// CHAPTER 1: MATCHING SYSTEM
+let activeLeft = null;
+let matchedCount = 0;
+const leftTiles = document.querySelectorAll('#deck-left .match-tile');
+const rightTiles = document.querySelectorAll('#deck-right .match-tile');
+
+leftTiles.forEach(tile => {
+  tile.addEventListener('click', () => {
+    if (tile.classList.contains('matched')) return;
+    leftTiles.forEach(t => t.classList.remove('selected'));
+    tile.classList.add('selected');
+    activeLeft = tile;
+  });
+});
+
+rightTiles.forEach(tile => {
+  tile.addEventListener('click', () => {
+    if (tile.classList.contains('matched') || !activeLeft) return;
+    const lId = activeLeft.getAttribute('data-node');
+    const rId = tile.getAttribute('data-match');
+
+    if (lId === rId) {
+      activeLeft.classList.remove('selected');
+      activeLeft.classList.add('matched');
+      tile.classList.add('matched');
+      activeLeft = null;
+      matchedCount++;
+      document.getElementById('matchScore').innerText = `Linked: ${matchedCount} / 5 Nodes`;
+      if (matchedCount === 5) {
+        document.getElementById('matchScore').style.color = "var(--spider-green)";
+        document.getElementById('matchScore').innerText = "✔ All Tech Nodes Successfully Synchronized!";
+      }
+    } else {
+      tile.style.borderColor = "var(--spider-red)";
+      setTimeout(() => { tile.style.borderColor = "var(--card-border)"; }, 600);
+    }
+  });
+});
+
+function resetMatches() {
+  matchedCount = 0;
+  activeLeft = null;
+  document.querySelectorAll('.match-tile').forEach(t => {
+    t.classList.remove('selected', 'matched');
+  });
+  document.getElementById('matchScore').innerText = "Linked: 0 / 5 Nodes";
+  document.getElementById('matchScore').style.color = "var(--muted)";
+}
+
+// CHIP SELECTOR
+function selectChip(el) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.chip').forEach(c => c.classList.remove('chosen'));
+  el.classList.add('chosen');
+}
+
+// CHAPTER 3: VALIDATE RECAP
+function validateTerminalRecap() {
+  let score = 0;
+  const banner = document.getElementById('terminalBanner');
+
+  // c0_1: trigger
+  const c0_1 = document.querySelector('#c0_1 .chip.chosen');
+  if (c0_1 && c0_1.innerText.toLowerCase() === 'trigger') score++;
+
+  // c0_2: terminates
+  const c0_2 = document.getElementById('c0_2');
+  if (c0_2.value.trim().toLowerCase() === 'terminates') {
+    c0_2.style.borderColor = "var(--spider-green)";
+    score++;
+  } else {
+    c0_2.style.borderColor = "var(--spider-red)";
+  }
+
+  // c1_1: replaces
+  const c1_1 = document.querySelector('#c1_1 .chip.chosen');
+  if (c1_1 && c1_1.innerText.toLowerCase() === 'replaces') score++;
+
+  // c1_2: will broadcast / 'll broadcast
+  const c1_2 = document.getElementById('c1_2');
+  const v1_2 = c1_2.value.trim().toLowerCase();
+  if (v1_2 === 'will broadcast' || v1_2 === "'ll broadcast" || v1_2 === "can broadcast") {
+    c1_2.style.borderColor = "var(--spider-green)";
+    score++;
+  } else {
+    c1_2.style.borderColor = "var(--spider-red)";
+  }
+
+  // c1_3: discover
+  const c1_3 = document.getElementById('c1_3');
+  if (c1_3.value.trim().toLowerCase() === 'discover') {
+    c1_3.style.borderColor = "var(--spider-green)";
+    score++;
+  } else {
+    c1_3.style.borderColor = "var(--spider-red)";
+  }
+
+  // c1_4: will ban
+  const c1_4 = document.querySelector('#c1_4 .chip.chosen');
+  if (c1_4 && c1_4.innerText.toLowerCase() === 'will ban') score++;
+
+  banner.style.display = 'block';
+  if (score >= 5) {
+    banner.style.color = "var(--spider-green)";
+    banner.innerText = `✔ EXCELLENT WORK: ${score} / 6 parameters stabilized. Mainframe console safe!`;
+  } else {
+    banner.style.color = "var(--spider-yellow)";
+    banner.innerText = `⚠ SYSTEM DIAGNOSTIC: ${score} / 6 correct. Check your present vs future clauses.`;
+  }
+}
+
+// CHAPTER 4: MULTIVERSE GAPS VALIDATION
+function validateMultiverseGaps() {
+  let score = 0;
+  const banner = document.getElementById('matrixBanner');
+
+  const checkField = (id, validArray) => {
+    const el = document.getElementById(id);
+    const val = el.value.trim().toLowerCase();
+    if (validArray.includes(val)) {
+      el.style.borderColor = "var(--spider-green)";
+      score++;
+    } else {
+      el.style.borderColor = "var(--spider-red)";
+    }
+  };
+
+  // 1: had, would buy
+  checkField('m_c2_1', ['had']);
+  checkField('m_c2_2', ['would buy', "'d buy", 'could buy']);
+
+  // 2: had tested, would have found
+  checkField('m_c3_1', ['had tested']);
+  checkField('m_c3_2', ['would have found', "'d have found", 'could have found']);
+
+  // 3: knew, would design
+  checkField('m_c2_3', ['knew']);
+  checkField('m_c2_4', ['would design', "'d design", 'could design']);
+
+  // 4: had not lost / hadn't lost, would have reached
+  checkField('m_c3_3', ['had not lost', "hadn't lost"]);
+  checkField('m_c3_4', ['would have reached', "'d have reached"]);
+
+  banner.style.display = 'block';
+  if (score >= 7) {
+    banner.style.color = "var(--spider-green)";
+    banner.innerText = `✔ MULTIVERSE SYNCHRONIZED: ${score} / 8 timelines aligned cleanly!`;
+  } else {
+    banner.style.color = "var(--spider-yellow)";
+    banner.innerText = `⚠ GLITCH DETECTED: ${score} / 8 correct. Review Type 2 (V2 -> would+V1) and Type 3 (had+V3 -> would have+V3).`;
+  }
+}
+
+// CHAPTER 5: VERB FORGE VALIDATION
+function validateVerbForge() {
+  let score = 0;
+  const banner = document.getElementById('verbBanner');
+
+  const check = (id, target) => {
+    const el = document.getElementById(id);
+    if (el.value.trim().toLowerCase() === target) {
+      el.style.borderColor = "var(--spider-green)";
+      score++;
+    } else {
+      el.style.borderColor = "var(--spider-red)";
+    }
+  };
+
+  check('v1', 'froze');
+  check('v2', 'built');
+  check('v3', 'wrote');
+  check('v4', 'grown');
+
+  banner.style.display = 'block';
+  if (score === 4) {
+    banner.style.color = "var(--spider-green)";
+    banner.innerText = `⚡ 100% RECOGNITION: All irregular forms anchored properly!`;
+  } else {
+    banner.style.color = "var(--spider-yellow)";
+    banner.innerText = `⚠ ANCHOR SLIP: ${score} / 4 correct. Remember: V2 swings alone (froze, wrote); V3 needs a helper (built, grown).`;
+  }
+}
+
+// CHAPTER 6: B2 LISTENING (TTS & VALIDATION)
+const transcript = `Good afternoon, engineering crew. This is an urgent operational briefing from the technical director here at Romexpo Arena Hall B. Please pay close attention. As you witnessed fifteen minutes ago during our preliminary showcase, the main tournament match ground to an agonizing halt. Let us analyze what went wrong. The root cause was not an external denial-of-service attack, contrary to rumors circulating on Twitter. Rather, it was our experimental real-time AI crowd engine. Whenever four hundred spectators enter the virtual colosseum simultaneously, the server tries to calculate autonomous pathfinding routines for every single avatar. Consequently, our CPU usage spiked to ninety-nine percent, triggering massive frame rate drops and rendering the game practically unplayable for the finalists on stage. One of our junior developers suggested lowering our server tick-rate from one hundred and twenty Hertz down to thirty Hertz. However, if we lowered the tick-rate to thirty Hertz right now, the competitive players would immediately notice severe hit-registration discrepancies. In a fast-paced shooter, bullets would pass straight through hitboxes. That is completely unacceptable for a sanctioned championship. Looking back, our current predicament is entirely our own fault. If we had conducted a rigorous stress-test on Thursday afternoon with simulated synthetic users, we would have discovered this memory accumulation leak prior to opening the gates to the public. We simply ran out of time and trusted our local benchmarks. Here is our mitigation plan for the grand finals scheduled for sixteen-thirty: we cannot rewrite the pathfinding algorithm in two hours. Therefore, we are temporarily disabling all non-essential visual scripts, disabling ambient particle effects, and stripping down background audience models. If every team member executes their allocated maintenance patch within the next twenty minutes, the staging environment will remain perfectly stable. Report back to station four as soon as your modules are deployed. Let's make this tournament work.`;
+
+let synth = window.speechSynthesis;
+let utter = null;
+
+function toggleSpeech() {
+  if (!synth) {
+    alert("Web Speech API is not supported in this browser.");
+    return;
+  }
+  if (synth.speaking) {
+    synth.cancel();
+    document.getElementById('playAudioBtn').innerText = "▶ Resume Stream";
+    document.getElementById('hudWave').style.opacity = "0.25";
+    return;
+  }
+  utter = new SpeechSynthesisUtterance(transcript);
+  utter.rate = 0.93;
+  utter.pitch = 1.0;
+
+  utter.onstart = () => {
+    document.getElementById('playAudioBtn').innerText = "⏸ Pause Stream";
+    document.getElementById('hudWave').style.opacity = "1";
+  };
+  utter.onend = () => {
+    document.getElementById('playAudioBtn').innerText = "▶ Replay Dispatch";
+    document.getElementById('hudWave').style.opacity = "0.25";
+  };
+  synth.speak(utter);
+}
+
+function stopSpeech() {
+  if (synth) {
+    synth.cancel();
+    document.getElementById('playAudioBtn').innerText = "▶ Stream Dispatch (TTS)";
+    document.getElementById('hudWave').style.opacity = "0.25";
+  }
+}
+
+function validateListening() {
+  const answers = { bq1: 'B', bq2: 'A', bq3: 'C', bq4: 'B' };
+  let correct = 0;
+
+  for (let q in answers) {
+    const selected = document.querySelector(`input[name="${q}"]:checked`);
+    const cardId = 'qc' + q.replace('bq', '');
+    const card = document.getElementById(cardId);
+
+    if (selected && selected.value === answers[q]) {
+      card.style.borderColor = "var(--spider-green)";
+      correct++;
+    } else {
+      card.style.borderColor = "var(--spider-red)";
+    }
+  }
+
+  const banner = document.getElementById('listeningBanner');
+  banner.style.display = 'block';
+  if (correct === 4) {
+    banner.style.color = "var(--spider-green)";
+    banner.innerText = `📡 INTEL DECRYPTED: 4 / 4 Correct! Outstanding B2 comprehension.`;
+  } else {
+    banner.style.color = "var(--spider-yellow)";
+    banner.innerText = `⚠ AUDIO INTEL: ${correct} / 4 Correct. Review questions marked with red border.`;
+  }
+}
+
+// CHAPTER 7: FIELD WRITING ANALYZER
+function validateWriting() {
+  const wr1 = document.getElementById('wr1').value.toLowerCase();
+  const wr2 = document.getElementById('wr2').value.toLowerCase();
+  const banner = document.getElementById('writingBanner');
+  const s1 = document.getElementById('wr1-status');
+  const s2 = document.getElementById('wr2-status');
+
+  let p1Pass = wr1.includes('if') && (wr1.includes('would') || wr1.includes('could')) && (wr1.includes('had') || wr1.includes('owned') || wr1.includes('were'));
+  let p2Pass = wr2.includes('if') && (wr2.includes('had') || wr2.includes("hadn't")) && (wr2.includes('would have') || wr2.includes("wouldn't have")) && (wr2.includes('frozen') || wr2.includes('grown') || wr2.includes('built'));
+
+  s1.innerText = p1Pass ? "✔ Type 2 Structure Verified (If + Past Simple, would + V1)" : "⚠ Needs: 'If' + Past Simple verb + 'would/could'";
+  s1.style.color = p1Pass ? "var(--spider-green)" : "var(--spider-yellow)";
+
+  s2.innerText = p2Pass ? "✔ Type 3 Structure Verified (If + had + V3, would have + V3)" : "⚠ Needs: 'If' + had/hadn't + V3 + 'would have' + V3 verb (e.g. frozen, grown)";
+  s2.style.color = p2Pass ? "var(--spider-green)" : "var(--spider-yellow)";
+
+  banner.style.display = 'block';
+  if (p1Pass && p2Pass) {
+    banner.style.color = "var(--spider-green)";
+    banner.innerText = "🚀 OPERATIVE TRANSMISSION APPROVED: Both sentences satisfy high-level conditional syntax!";
+  } else {
+    banner.style.color = "var(--spider-yellow)";
+    banner.innerText = "⚠ TERMINAL FEEDBACK: One or both sentences need structural refinement.";
+  }
+}
+</script>
+</body>
+</html>
